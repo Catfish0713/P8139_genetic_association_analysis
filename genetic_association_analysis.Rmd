@@ -1,0 +1,48 @@
+---
+title: "genetic_association_analysis_case_control"
+author: "Ruixi Li"
+date: "2024-02-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+# load the data
+gc <- c(10,190, 800, 3, 100, 900)
+ac <- c(2*gc[1]+gc[2], gc[2]+2*gc[3], 2*gc[4]+gc[5], gc[5]+2*gc[6]) 
+gc1 <- c(gc[1]+gc[2],gc[3], gc[4]+gc[5], gc[6]) 
+gc2 <- c(gc[1], gc[2]+gc[3], gc[4], gc[5]+gc[6])
+
+# chi-square test
+pvg <- chisq.test(matrix(gc,ncol=3, byrow=T), corr=FALSE)$p.value 
+pva <- chisq.test(matrix(ac,ncol=2, byrow=T), corr=FALSE)$p.value 
+pvg1<-chisq.test(matrix(gc1,ncol=2, byrow=T), corr=FALSE)$p.value 
+pvg2<-chisq.test(matrix(gc2, ncol=2, byrow=T),corr=FALSE)$p.value 
+pvb <- min(pvg1,pvg2)
+
+print(c(pvg,pva,pvb)) # 6.918239e-09 9.150309e-10 1.224003e-09 
+
+# fisher's exact test
+pvg.f <- fisher.test(matrix(gc,ncol=3,byrow=T))$p.value 
+pva.f <- fisher.test(matrix(ac,ncol=2,byrow=T))$p.value 
+pvg1.f <- fisher.test(matrix(gc1,ncol=2,byrow=T))$p.value 
+pvg2.f <- fisher.test(matrix(gc2,ncol=2,byrow=T))$p.value 
+pvb.f <- min(pvg1.f,pvg2.f)
+print(c(pvg.f,pva.f,pvb.f))# 2.412721e-09 8.047005e-10 1.132535e-09
+
+# Cochran-Armitage trend test
+pvcat <- prop.trend.test(gc[1:3], gc[1:3]+gc[4:6], score=c(0, 0.5, 1))$p.value 
+print(c(pvcat)) # 9.820062e-10
+
+
+gc <- gc*2
+...	# repeat the tests	
+print(c(pvg, pva, pvb))	# 4.786203e-17 4.716312e-18 8.379499e-18	
+print(c(pvg.f, pva.f,pvb.f))# 1.231881e-17 3.485271e-18 6.810263e-18 
+print(c(pvcat))# 5.422705e-18
+```
+
